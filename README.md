@@ -4,8 +4,8 @@ PeacefulPorcupine
 The peace bridge between UIC and ENCORE
 
 
-Compiling & Running
--------------------
+Configuring & Running
+---------------------
 
 You will need scala 2.10.1 and sbt.
 
@@ -13,8 +13,12 @@ On OS X you can install these using:
 
 `brew install scala sbt`
 
-To run and compile:
+You should configure the application by copying `src/main/resources/reference.conf`
+into `src/main/resources/application.conf` and modifying all of the necessary options
+for your environment (XMPP account, WakefulWeasel URL, etc.)
+
+Once you've configured everything in `application.conf`, run and compile:
 
 `sbt run`
 
-Currently all configuration values are hard-coded into `PeacefulPorcupine.scala`. This will hopefully change soon.
+The application will log all actions to the console.

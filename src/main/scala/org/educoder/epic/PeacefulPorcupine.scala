@@ -18,7 +18,11 @@ import scala.collection.JavaConversions._
 import scala.collection._
 import com.fasterxml.jackson.databind.node.ObjectNode
 import scala.util.matching.Regex
-import scala.Some
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
+import java.io.File
+
+//import scopt._
 
 object PeacefulPorcupine extends App {
 
@@ -29,6 +33,27 @@ object PeacefulPorcupine extends App {
   val DrowsyCollChannelPattern = ("(/"+DrowsyDbPattern+"/"+DrowsyCollPattern+")/\\*$").r
   val DrowsyDocChannelPattern = ("(/"+DrowsyDbPattern+"/"+DrowsyCollPattern+"/"+DrowsyIdPattern+")$").r
 
+
+  val conf = ConfigFactory.load
+
+  println(conf.getObject("porcupine").render())
+
+  lazy val xmppJid = conf.getString("porcupine.xmpp.jid")
+  lazy val xmppPassword = conf.getString("porcupine.xmpp.password")
+  lazy val xmppRoom = conf.getString("porcupine.xmpp.chatroom")
+  lazy val wakefulUrl = conf.getString("porcupine.wakeful.url")
+  lazy val drowsyUrl = conf.getString("porcupine.wakeful.url")
+
+//  val optParser = new scopt.OptionParser[Config]("PeacfulPorcupine") {
+//    head("PeacefulPorcupine")
+//    opt[String]('j', "xmpp-jid") action {(v,c) => c.copy(xmppJid = v)} text "XMPP JID to connect as"
+//    opt[String]('p', "xmpp-password") action {(v,c) => c.copy(xmppPassword = v)} text "XMPP password for the given JID"
+//    opt[String]('r', "xmpp-chatroom") action {(v,c) => c.copy(xmppRoom = v)} text "XMPP chatroom JID to connect to"
+//    opt[String]('w', "wakeful-url") action {(v,c) => c.copy(wakefulUrl = v)} text "WakefulWeasel base URL"
+//    opt[String]('d', "drowsy-url") action {(v,c) => c.copy(drowsyUrl = v)} text "DrowsyDromedary base URL"
+//    help("h") text "Prints this usage text"
+//  }
+
   val system = ActorSystem("EPIC")
   val ag = system.actorOf(Props[Peacemaker], name = "peaceful-porcupine")
 
@@ -36,15 +61,12 @@ object PeacefulPorcupine extends App {
     val http: HttpClient = new HttpClient()
     http.start()
 
-    val peh: PorcupineEventHandler = new PorcupineEventHandler("gugo@glint", "gugo", "porcupine@conference.glint")
-
-    val weaselUrl = "http://localhost:7777/faye"
-    val drowsyUrl = "http://localhost:9292"
+    val peh: PorcupineEventHandler = new PorcupineEventHandler(xmppJid, xmppPassword, xmppRoom)
 
     val options = new java.util.HashMap[String, Object]()
     val transport: ClientTransport = LongPollingTransport.create(options, http)
     //val transport: ClientTransport = WebSocketTransport.create(options, websocketFactory);
-    val fayeClient: BayeuxClient = new BayeuxClient(weaselUrl, transport)
+    val fayeClient: BayeuxClient = new BayeuxClient(wakefulUrl, transport)
     val drowsyClient: HttpClient = new HttpClient()
     drowsyClient.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL)
 
@@ -134,7 +156,7 @@ object PeacefulPorcupine extends App {
       def onMessage(channel: ClientSessionChannel, message: Message) {
         if (message.isSuccessful) {
           println(s"# $channel")
-          subscribe("/ck-test2/contributions/*")
+          //subscribe("/ck-test2/contributions/*")
         } else {
           println(s"! handshake failed")
         }

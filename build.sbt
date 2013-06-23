@@ -34,6 +34,12 @@ libraryDependencies += "org.igniterealtime.smack" % "smack" % "3.2.1"
 
 libraryDependencies += "org.igniterealtime.smack" % "smackx" % "3.2.1"
 
+//libraryDependencies += "com.github.scopt" %% "scopt" % "3.0.0"
+
+//resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+
+//libraryDependencies += "org.skife.com.typesafe.config" % "typesafe-config" % "0.3.0"
+
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
     val dirs = (libs / "batik") +++ (libs / "libtw") +++ (libs / "kiama")
